@@ -1,4 +1,3 @@
-```markdown
 # Soil Analysis and Crop Recommendation System
 
 This project provides a comprehensive web application for analyzing soil images to determine soil type and moisture level, then offering crop recommendations and market insights using AI. It integrates machine learning models for image classification, the Gemini AI model for detailed agricultural advice, and external APIs for real-time market data.
@@ -142,4 +141,3 @@ Feel free to fork the repository, open issues, and submit pull requests.
 This project is open-source and available under the MIT License.
 
 ---
-```
