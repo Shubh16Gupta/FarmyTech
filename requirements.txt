@@ -4,3 +4,4 @@ torchvision
 Pillow
 google-generativeai
 requests
+matplotlib
