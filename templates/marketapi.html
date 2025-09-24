@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h3 class="card-title mb-0"><i class="fas fa-chart-line"></i> Crop Market Analysis</h3>
+            </div>
+            <div class="card-body">
+                <!-- Search Section -->
+                <div class="row mb-4">
+                    <div class="col-md-8 offset-md-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="cropSearch" placeholder="Enter crop name (e.g., wheat, rice, corn, soybean, potato, tomato, onion, cotton, sugarcane)" list="cropSuggestions">
+                            <datalist id="cropSuggestions">
+                                <option value="Wheat">
+                                <option value="Rice">
+                                <option value="Corn">
+                                <option value="Soybean">
+                                <option value="Potato">
+                                <option value="Tomato">
+                                <option value="Onion">
+                                <option value="Cotton">
+                                <option value="Sugarcane">
+                            </datalist>
+                            <button class="btn btn-primary" type="button" id="searchBtn">
+                                <i class="fas fa-search"></i> Analyze Market
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="loading" class="text-center" style="display: none;">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Fetching market data...</p>
+                </div>
+
+                <!-- Results Section -->
+                <div id="results" style="display: none;">
+                    <!-- Market Overview -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card text-center h-100">
+                                <div class="card-header bg-info text-white">
+                                    <i class="fas fa-seedling"></i> Crop Name
+                                </div>
+                                <div class="card-body">
+                                    <h3 id="cropName" class="text-success"></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center h-100">
+                                <div class="card-header bg-warning text-dark">
+                                    <i class="fas fa-rupee-sign"></i> Current Price (₹/Quintal)
+                                </div>
+                                <div class="card-body">
+                                    <h3 id="currentPrice" class="text-primary"></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center h-100">
+                                <div class="card-header bg-primary text-white">
+                                    <i class="fas fa-chart-line"></i> Market Trend
+                                </div>
+                                <div class="card-body">
+                                    <h3 id="marketTrend" class="text-info"></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Price Change Indicator -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 offset-md-3">
+                            <div class="card text-center">
+                                <div class="card-header bg-secondary text-white">
+                                    <i class="fas fa-percentage"></i> Price Change (This Year)
+                                </div>
+                                <div class="card-body">
+                                    <h2 id="priceChange" class="display-6"></h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <i class="fas fa-chart-bar"></i> Monthly Price Trends (Current Year)
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="priceChart" height="250"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <i class="fas fa-chart-area"></i> Yearly Production Trends
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="productionChart" height="250"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendation -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-warning text-dark">
+                                    <i class="fas fa-lightbulb"></i> Market Recommendation
+                                </div>
+                                <div class="card-body">
+                                    <p id="recommendation" class="lead mb-0"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Data Table -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-secondary text-white">
+                                    <i class="fas fa-table"></i> Detailed Market Data
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Period</th>
+                                                    <th>Price (₹/Quintal)</th>
+                                                    <th>Production Index</th>
+                                                    <th>Trend</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="dataTable">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div id="error" class="alert alert-danger mt-3" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Global variables for charts
+let priceChart = null;
+let productionChart = null;
+
+document.getElementById('searchBtn').addEventListener('click', function() {
+    const cropName = document.getElementById('cropSearch').value.trim();
+    
+    if (!cropName) {
+        showError('Please enter a crop name');
+        return;
+    }
+    
+    fetchMarketData(cropName);
+});
+
+document.getElementById('cropSearch').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('searchBtn').click();
+    }
+});
+
+function fetchMarketData(cropName) {
+    // Show loading, hide results and error
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('error').style.display = 'none';
+    
+    fetch(`/api/market-data/${encodeURIComponent(cropName)}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        document.getElementById('loading').style.display = 'none';
+        
+        if (data.error) {
+            showError(data.error);
+        } else {
+            displayMarketData(data);
+            document.getElementById('results').style.display = 'block';
+            
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+    })
+    .catch(error => {
+        document.getElementById('loading').style.display = 'none';
+        showError('An error occurred while fetching market data: ' + error.message);
+    });
+}
+
+function displayMarketData(data) {
+    // Update basic information
+    document.getElementById('cropName').textContent = data.crop_name;
+    document.getElementById('currentPrice').textContent = `₹${data.current_price}`;
+    document.getElementById('marketTrend').textContent = data.market_trend;
+    
+    // Update price change with color coding
+    const priceChangeElem = document.getElementById('priceChange');
+    const priceChange = data.price_change;
+    priceChangeElem.textContent = `${priceChange > 0 ? '+' : ''}${priceChange}%`;
+    
+    if (priceChange > 0) {
+        priceChangeElem.className = 'display-6 text-success';
+    } else if (priceChange < 0) {
+        priceChangeElem.className = 'display-6 text-danger';
+    } else {
+        priceChangeElem.className = 'display-6 text-secondary';
+    }
+    
+    // Update recommendation
+    document.getElementById('recommendation').textContent = data.recommendation;
+    
+    // Create charts
+    createPriceChart(data.prices);
+    createProductionChart(data.yearly_data);
+    
+    // Populate data table
+    populateDataTable(data);
+}
+
+function createPriceChart(prices) {
+    const ctx = document.getElementById('priceChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (priceChart) {
+        priceChart.destroy();
+    }
+    
+    const months = prices.map(item => {
+        const [year, month] = item.month.split('-');
+        return new Date(year, month-1).toLocaleString('default', { month: 'short' });
+    });
+    
+    const priceValues = prices.map(item => item.price);
+    
+    priceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'Price (₹/Quintal)',
+                data: priceValues,
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Monthly Price Trends'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Price (₹/Quintal)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createProductionChart(yearlyData) {
+    const ctx = document.getElementById('productionChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (productionChart) {
+        productionChart.destroy();
+    }
+    
+    const years = yearlyData.map(item => item.year);
+    const values = yearlyData.map(item => item.value);
+    
+    productionChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: years,
+            datasets: [{
+                label: 'Production Index',
+                data: values,
+                backgroundColor: 'rgba(23, 162, 184, 0.6)',
+                borderColor: '#17a2b8',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Yearly Production Trends'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Production Index'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function populateDataTable(data) {
+    const tableBody = document.getElementById('dataTable');
+    tableBody.innerHTML = '';
+    
+    // Add monthly price data
+    data.prices.forEach(price => {
+        const [year, month] = price.month.split('-');
+        const monthName = new Date(year, month-1).toLocaleString('default', { month: 'long' });
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${monthName} ${year}</td>
+            <td>₹${price.price}</td>
+            <td>${data.yearly_data.find(d => d.year === year)?.value || 'N/A'}</td>
+            <td><span class="badge ${price.price > data.prices[0].price ? 'bg-success' : 'bg-danger'}">${price.price > data.prices[0].price ? '↑' : '↓'}</span></td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+function showError(message) {
+    const errorDiv = document.getElementById('error');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+}
+
+// Initialize with a default crop
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('cropSearch').value = 'wheat';
+    // Uncomment the line below to auto-load data on page load
+    // fetchMarketData('wheat');
+});
+</script>
+{% endblock %}

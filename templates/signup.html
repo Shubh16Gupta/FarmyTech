@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card signup-card">
+            <div class="card-header text-white text-center">
+                <h3 class="card-title mb-0">🌱 Create Your Account</h3>
+            </div>
+            <div class="card-body">
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">👤 Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">📧 Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">🔒 Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Sign Up</button>
+                </form>
+                
+                <div class="text-center mt-3">
+                    <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #f1f8e9, #ffffff);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Signup Card */
+    .signup-card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+        margin-top: 80px;
+        overflow: hidden;
+        background: #ffffff;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .signup-card:hover {
+        transform: translateY(-5px);
+    }
+
+    /* Card Header */
+    .signup-card .card-header {
+        background: linear-gradient(135deg, #2e7d32, #66bb6a);
+        padding: 20px;
+        font-weight: 600;
+        font-size: 1.4rem;
+        border-radius: 1rem 1rem 0 0 !important;
+    }
+
+    .card-title {
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+    /* Form Inputs */
+    .form-label {
+        font-weight: 500;
+        color: #2e7d32;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        padding: 12px 14px;
+        border: 1px solid #c8e6c9;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        font-size: 15px;
+    }
+
+    .form-control:focus {
+        border-color: #2e7d32;
+        box-shadow: 0 0 6px rgba(46, 125, 50, 0.3);
+    }
+
+    /* Button */
+    .btn-success {
+        background: linear-gradient(135deg, #4caf50, #81c784);
+        border: none;
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 12px 0;
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #2e7d32, #66bb6a);
+        transform: scale(1.03);
+    }
+
+    /* Error Alert */
+    .alert-danger {
+        border-radius: 8px;
+        font-weight: 500;
+        background: #ffcdd2;
+        color: #b71c1c;
+        border: none;
+    }
+
+    /* Links */
+    a {
+        text-decoration: none;
+        color: #2e7d32;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    a:hover {
+        color: #1b5e20;
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}

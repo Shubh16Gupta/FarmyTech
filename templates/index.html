@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Soil Analysis</h3>
+            </div>
+            <div class="card-body">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Upload Soil Image</label>
+                        <input class="form-control" type="file" id="file" name="file" accept="image/*" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Analyze Soil</button>
+                </form>
+                
+                <div id="loading" class="mt-3" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span class="ms-2">Analyzing soil image...</span>
+                </div>
+                
+                <div id="results" class="mt-4" style="display: none;">
+                    <h4>Analysis Results</h4>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header bg-info text-white">
+                                    <i class="fas fa-seedling"></i> Soil Type
+                                </div>
+                                <div class="card-body">
+                                    <h5 id="soilType" class="card-text text-center"></h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header bg-warning text-dark">
+                                    <i class="fas fa-tint"></i> Moisture Level
+                                </div>
+                                <div class="card-body">
+                                    <h5 id="moistureLevel" class="card-text text-center"></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <i class="fas fa-lightbulb"></i> Crop Recommendations & Cultivation Guide
+                        </div>
+                        <div class="card-body">
+                            <div id="geminiInfo" class="recommendations-content"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="error" class="alert alert-danger mt-3" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Markdown API function
+async function convertMarkdownToHTML(markdown) {
+    try {
+        const response = await fetch('https://markdown-api.tools.bitbee.uk/html', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ markdown })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        return result.html || result;
+    } catch (error) {
+        console.error('Markdown API error:', error);
+        // Fallback to simple formatting
+        return formatFallback(markdown);
+    }
+}
+
+// Fallback formatting if API fails
+function formatFallback(text) {
+    if (!text) return '<p class="text-muted">No recommendations available.</p>';
+    
+    return text
+        .split('\n\n')
+        .map(paragraph => {
+            const trimmed = paragraph.trim();
+            if (!trimmed) return '';
+            
+            // Check if it's a header
+            if (trimmed.match(/^#+\s/) || trimmed.match(/^\d+\.\s+[A-Z]/) || trimmed.endsWith(':')) {
+                return `<h5 class="text-success mt-3 mb-2">${trimmed}</h5>`;
+            }
+            
+            // Check if it's a list
+            if (trimmed.includes('* ') || trimmed.includes('- ')) {
+                const listItems = trimmed.split('\n')
+                    .filter(line => line.trim().startsWith('* ') || line.trim().startsWith('- '))
+                    .map(line => `<li class="list-group-item"><i class="fas fa-leaf me-2 text-success"></i>${line.trim().substring(2)}</li>`)
+                    .join('');
+                
+                return `<ul class="list-group list-group-flush mb-3">${listItems}</ul>`;
+            }
+            
+            // Regular paragraph
+            return `<p class="mb-3">${trimmed}</p>`;
+        })
+        .join('');
+}
+
+// Enhanced Gemini response formatting with API
+async function formatGeminiResponseWithAPI(text) {
+    if (!text) return '<p class="text-muted">No recommendations available.</p>';
+    
+    try {
+        // Clean and prepare the text for markdown conversion
+        const cleanText = cleanGeminiResponse(text);
+        
+        // Use the markdown API for conversion
+        const html = await convertMarkdownToHTML(cleanText);
+        
+        // Add Bootstrap styling to the API response
+        return addBootstrapStyling(html);
+    } catch (error) {
+        console.error('Error formatting with API:', error);
+        return formatFallback(text);
+    }
+}
+
+// Clean Gemini response for better markdown conversion
+function cleanGeminiResponse(text) {
+    return text
+        // Convert numbered sections to headers
+        .replace(/^(\d+)\.\s+([A-Z][^:\n]+)(:|$)/gm, '## $2')
+        // Convert lines ending with colon to headers
+        .replace(/^([A-Z][^:\n]+):$/gm, '### $1')
+        // Ensure proper markdown list formatting
+        .replace(/^\s*[-*]\s+/gm, '* ')
+        // Fix code blocks if present
+        .replace(/```(\w+)?\n([^`]+)```/g, '```$1\n$2\n```')
+        // Ensure proper spacing
+        .replace(/\n\s*\n/g, '\n\n');
+}
+
+// Add Bootstrap classes to the HTML from API
+function addBootstrapStyling(html) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    
+    // Style headers
+    const headers = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    headers.forEach(header => {
+        header.className = 'text-success mt-4 mb-3 border-bottom pb-2';
+        
+        // Add icon to headers
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-seedling me-2';
+        header.insertBefore(icon, header.firstChild);
+    });
+    
+    // Style lists
+    const lists = tempDiv.querySelectorAll('ul, ol');
+    lists.forEach(list => {
+        list.className = 'list-group list-group-flush mb-3';
+        
+        const items = list.querySelectorAll('li');
+        items.forEach(item => {
+            item.className = 'list-group-item';
+            
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-leaf me-2 text-success';
+            item.insertBefore(icon, item.firstChild);
+        });
+    });
+    
+    // Style paragraphs
+    const paragraphs = tempDiv.querySelectorAll('p');
+    paragraphs.forEach(p => {
+        p.className = 'mb-3';
+    });
+    
+    // Style code blocks
+    const codeBlocks = tempDiv.querySelectorAll('pre');
+    codeBlocks.forEach(pre => {
+        pre.className = 'bg-light p-3 rounded mb-3';
+    });
+    
+    return tempDiv.innerHTML;
+}
+
+// Main form submission handler
+document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData();
+    const fileInput = document.getElementById('file');
+    
+    if (fileInput.files.length === 0) {
+        showError('Please select a file');
+        return;
+    }
+    
+    formData.append('file', fileInput.files[0]);
+    
+    // Show loading, hide results and error
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('error').style.display = 'none';
+    
+    try {
+        const response = await fetch('/dashboard', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        document.getElementById('loading').style.display = 'none';
+        
+        if (data.error) {
+            showError(data.error);
+        } else {
+            // Update basic info
+            document.getElementById('soilType').textContent = data.soil_type;
+            document.getElementById('moistureLevel').textContent = data.moisture_level;
+            
+            // Format Gemini response using the API
+            const formattedHtml = await formatGeminiResponseWithAPI(data.gemini_info);
+            document.getElementById('geminiInfo').innerHTML = formattedHtml;
+            
+            document.getElementById('results').style.display = 'block';
+            
+            // Scroll to results smoothly
+            document.getElementById('results').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+    } catch (error) {
+        document.getElementById('loading').style.display = 'none';
+        showError('An error occurred: ' + error.message);
+    }
+});
+
+function showError(message) {
+    const errorDiv = document.getElementById('error');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    
+    // Scroll to error message
+    errorDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Add loading state to button during processing
+document.getElementById('uploadForm').addEventListener('submit', function() {
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Analyzing...';
+    submitBtn.disabled = true;
+    
+    // Reset button when request completes (handled in the fetch catch/finally)
+    setTimeout(() => {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }, 3000); // Fallback reset
+});
+</script>
+{% endblock %}

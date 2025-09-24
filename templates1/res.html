@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FarmyTech - Complete Farmer Assistance Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    :root {
+      --primary: #4CAF50;
+      --primary-dark: #388E3C;
+      --secondary: #FFC107;
+      --light: #F5F5F5;
+      --dark: #333;
+      --gray: #757575;
+      --success: #4CAF50;
+      --warning: #FF9800;
+      --danger: #F44336;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --radius: 8px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: #f9f9f9;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 1rem 0;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo i {
+      font-size: 2rem;
+    }
+
+    .logo h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 1.5rem;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.3s;
+    }
+
+    nav a:hover, nav a.active {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
+
+    .user-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-welcome {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      background-color: white;
+      color: var(--primary);
+      border: none;
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #f0f0f0;
+      transform: translateY(-2px);
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.9rem;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid white;
+      color: white;
+    }
+
+    .btn-outline:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .hero {
+      background: linear-gradient(rgba(76, 175, 80, 0.9), rgba(56, 142, 60, 0.9)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
+      background-size: cover;
+      background-position: center;
+      color: white;
+      padding: 4rem 0;
+      text-align: center;
+      margin-bottom: 2rem;
+      border-radius: 0 0 var(--radius) var(--radius);
+    }
+
+    .hero-content h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero-content p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .feature-card {
+      background: white;
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: transform 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .feature-card i {
+      font-size: 3rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .dashboard-section {
+      background: white;
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+      font-size: 1.5rem;
+    }
+
+    .reminder-card {
+      background: linear-gradient(135deg, #FFC107, #FFA000);
+      color: white;
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .upload-area {
+      border: 2px dashed #ccc;
+      border-radius: var(--radius);
+      padding: 3rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 2rem;
+    }
+
+    .upload-area:hover {
+      border-color: var(--primary);
+      background-color: rgba(76, 175, 80, 0.05);
+    }
+
+    .upload-area i {
+      font-size: 4rem;
+      color: #ccc;
+      margin-bottom: 1rem;
+    }
+
+    .results {
+      display: none;
+    }
+
+    .result-card {
+      background: #f9f9f9;
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--primary);
+    }
+
+    .result-card h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1rem;
+      color: var(--dark);
+    }
+
+    .soil-analysis-form {
+      text-align: center;
+      margin-top: 20px;
+      padding: 20px;
+      border: 2px dashed #ccc;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .soil-analysis-form:hover {
+      border-color: var(--primary);
+    }
+
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 4px solid var(--primary);
+      width: 30px;
+      height: 30px;
+      animation: spin 2s linear infinite;
+      margin: 20px auto;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .gemini-info {
+      white-space: pre-wrap;
+      background: #f9f9f9;
+      padding: 1rem;
+      border-radius: var(--radius);
+      margin-top: 1rem;
+    }
+
+    footer {
+      background: var(--dark);
+      color: white;
+      padding: 3rem 0 1rem;
+      margin-top: 3rem;
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-section h3 {
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+
+    .social-icons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .social-icons a {
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    .copyright {
+      text-align: center;
+      padding-top: 1rem;
+      border-top: 1px solid #444;
+      color: #ccc;
+    }
+
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--success);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: none;
+      align-items: center;
+      gap: 10px;
+      z-index: 3000;
+      animation: slideIn 0.3s;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .hero-content h2 {
+        font-size: 2rem;
+      }
+      
+      .reminder-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-content">
+      <div class="logo">
+        <i class="fas fa-leaf"></i>
+        <h1>FarmyTech</h1>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="/" class="active">Dashboard</a></li>
+          <li><a href="/history">History</a></li>
+          <li><a href="#market">Marketplace</a></li>
+          <li><a href="#support">Support</a></li>
+        </ul>
+      </nav>
+      <div class="user-actions">
+        <div class="user-welcome" id="userWelcome">
+          <span>Welcome, <span id="username">User</span></span>
+          <button class="btn btn-sm" id="logoutBtn">Logout</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="hero">
+      <div class="hero-content">
+        <h2>AI-Powered Farming Solutions</h2>
+        <p>Upload soil images for analysis and get personalized crop recommendations, investment insights, and growth strategies.</p>
+        <a href="#analysis" class="btn">Get Started</a>
+      </div>
+    </div>
+
+    <div class="features">
+      <div class="feature-card">
+        <i class="fas fa-robot"></i>
+        <h3>AI Soil Analysis</h3>
+        <p>Our advanced AI analyzes soil conditions and provides accurate recommendations.</p>
+      </div>
+      <div class="feature-card">
+        <i class="fas fa-chart-line"></i>
+        <h3>Progress Tracking</h3>
+        <p>Monitor your farm's progress with regular updates and historical data.</p>
+      </div>
+      <div class="feature-card">
+        <i class="fas fa-cloud-sun"></i>
+        <h3>Weather Integration</h3>
+        <p>Get weather predictions and recommendations based on local conditions.</p>
+      </div>
+    </div>
+
+    <section id="analysis" class="dashboard-section">
+      <h2 class="section-title"><i class="fas fa-cloud-upload-alt"></i> Soil Analysis</h2>
+      
+      <div class="reminder-card" id="uploadReminder">
+        <p><i class="fas fa-bell"></i> <strong>Reminder:</strong> It's time to upload your soil photos for analysis. Regular updates help us provide better recommendations.</p>
+        <button class="btn btn-sm" onclick="document.getElementById('fileInput').click()">Upload Now</button>
+      </div>
+      
+      <div class="soil-analysis-container">
+        <h2>🌱 Soil Prediction Analysis</h2>
+        <p>Upload an image of soil to get predictions on its type and moisture level, along with detailed crop recommendations.</p>
+
+        <form id="uploadForm" enctype="multipart/form-data" class="soil-analysis-form">
+          <input type="file" name="file" id="fileInput" accept="image/*" required>
+          <button type="submit" class="btn">Get Predictions</button>
+        </form>
+
+        <div class="loader" id="loader"></div>
+        
+        <div id="result" class="results">
+          <h2 class="section-title"><i class="fas fa-chart-bar"></i> Prediction Results</h2>
+          
+          <div class="result-card">
+            <h3><i class="fas fa-info-circle"></i> Soil Information</h3>
+            <p><strong>Soil Type:</strong> <span id="soilType">-</span></p>
+            <p><strong>Moisture Level:</strong> <span id="moistureLevel">-</span></p>
+          </div>
+          
+          <div class="result-card">
+            <h3><i class="fas fa-robot"></i> Detailed AI Analysis</h3>
+            <div id="gemini-info-container" class="gemini-info"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <div class="container footer-content">
+      <div class="footer-section">
+        <h3>FarmyTech</h3>
+        <p>AI-powered farming assistance for higher yields and sustainable practices.</p>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-linkedin"></i></a>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h3>Quick Links</h3>
+        <p><a href="#">How It Works</a></p>
+        <p><a href="#">Crop Database</a></p>
+        <p><a href="#">Weather Forecast</a></p>
+        <p><a href="#">Market Prices</a></p>
+      </div>
+      <div class="footer-section">
+        <h3>Contact Us</h3>
+        <p><i class="fas fa-envelope"></i> support@farmytech.com</p>
+        <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+        <p><i class="fas fa-map-marker-alt"></i> 123 Farm Lane, Agriculture City</p>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>&copy; 2025 FarmyTech. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div class="notification" id="notification">
+    <i class="fas fa-check-circle"></i> 
+    <span id="notificationText">Your soil analysis has been completed successfully!</span>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script>
+    // Check authentication
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/user');
+        if (response.ok) {
+          const user = await response.json();
+          document.getElementById('username').textContent = user.name;
+        } else {
+          window.location.href = '/login';
+        }
+      } catch (error) {
+        window.location.href = '/login';
+      }
+    }
+
+    // Show notification
+    function showNotification(message, isError = false) {
+      const notification = document.getElementById('notification');
+      const notificationText = document.getElementById('notificationText');
+      
+      notificationText.textContent = message;
+      notification.style.background = isError ? '#F44336' : '#4CAF50';
+      notification.style.display = 'flex';
+      
+      setTimeout(() => { 
+        notification.style.display = 'none'; 
+      }, 3000);
+    }
+
+    // Soil Analysis Form Handling
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+      
+      if (!file) {
+        showNotification('Please select an image file.', true);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // Show loader and hide previous results
+      document.getElementById('loader').style.display = 'block';
+      document.getElementById('result').style.display = 'none';
+      
+      try {
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          showNotification('Error: ' + data.error, true);
+        } else {
+          document.getElementById('soilType').textContent = data.soil_type;
+          document.getElementById('moistureLevel').textContent = data.moisture_level;
+          document.getElementById('gemini-info-container').innerHTML = marked.parse(data.gemini_info);
+          document.getElementById('result').style.display = 'block';
+          showNotification('Soil analysis completed successfully!');
+        }
+      } catch (error) {
+        showNotification('An error occurred while connecting to the server.', true);
+      } finally {
+        document.getElementById('loader').style.display = 'none';
+      }
+    });
+
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      fetch('/logout')
+        .then(() => {
+          window.location.href = '/login';
+        });
+    });
+
+    // Initialize page
+    checkAuth();
+  </script>
+</body>
+</html>

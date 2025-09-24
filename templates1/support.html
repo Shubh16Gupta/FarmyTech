@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Support - AgriVision</title>
+  <link rel="stylesheet" href="/assets/css/support.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!--  Header -->
+  <header>
+    <div class="container header-content">
+      <div class="logo">
+        <i class="fas fa-leaf"></i>
+        <h1>AgriVision</h1>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Dashboard</a></li>
+          <li><a href="analytics.html">Analytics</a></li>
+          <li><a href="history.html">History</a></li>
+          <li><a href="market.html">Marketplace</a></li>
+          <li><a href="support.html" class="active">Support</a></li>
+        </ul>
+      </nav>
+      <div class="user-actions">
+        <div class="user-welcome">
+          <span>Welcome, <span id="username">Farmer</span></span>
+          <button class="btn btn-sm" id="logoutBtn">Logout</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!--  Page Content -->
+  <div class="container">
+    <div class="page-header">
+      <h2><i class="fas fa-headset"></i> Support Center</h2>
+      <p>We’re here to help you with anything related to AgriVision.</p>
+    </div>
+
+    <section class="support-grid">
+      <!-- Contact Info -->
+      <div class="card contact-card">
+        <h3><i class="fas fa-address-card"></i> Contact Us</h3>
+        <p><i class="fas fa-envelope"></i> support@agrivision.com</p>
+        <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+        <p><i class="fas fa-map-marker-alt"></i> 123 Green Lane, AgriCity</p>
+      </div>
+
+      <!-- Ticket Form -->
+      <div class="card form-card">
+        <h3><i class="fas fa-ticket-alt"></i> Submit a Ticket</h3>
+        <form id="supportForm">
+          <div class="form-group">
+            <label for="name"><i class="fas fa-user"></i> Name</label>
+            <input type="text" id="name" placeholder="Your Name" required>
+          </div>
+          <div class="form-group">
+            <label for="email"><i class="fas fa-envelope"></i> Email</label>
+            <input type="email" id="email" placeholder="Your Email" required>
+          </div>
+          <div class="form-group">
+            <label for="issue"><i class="fas fa-comment-dots"></i> Describe Issue</label>
+            <textarea id="issue" placeholder="Write your issue here..." required></textarea>
+          </div>
+          <button type="submit" class="btn">Submit</button>
+        </form>
+      </div>
+
+      <!-- FAQs -->
+      <div class="card faq-card">
+        <h3><i class="fas fa-question-circle"></i> FAQs</h3>
+        <details>
+          <summary>🔑 How do I reset my password?</summary>
+          <p>Go to login and click <b>"Forgot Password"</b>. Follow the instructions sent to your email.</p>
+        </details>
+        <details>
+          <summary>🌱 How can I update my crop data?</summary>
+          <p>Navigate to <b>Dashboard > Update Crop Info</b> and submit new data.</p>
+        </details>
+        <details>
+          <summary>📊 Can I export my analytics?</summary>
+          <p>Yes, go to <b>Analytics</b> and click on the <b>"Export Report"</b> button.</p>
+        </details>
+      </div>
+    </section>
+  </div>
+
+  <!--  Footer -->
+  <footer>
+    <div class="container footer-content">
+      <p>&copy; 2025 AgriVision. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!--  Small JS for form -->
+  <script>
+  
+  const usernameDisplay = document.getElementById("username");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const loggedInUser = localStorage.getItem("user");
+    if (loggedInUser) {
+      usernameDisplay.textContent = loggedInUser;
+      logoutBtn.style.display = "inline-block";
+    } else {
+      usernameDisplay.textContent = "Guest";
+      logoutBtn.style.display = "none";
+    }
+  });
+
+  // Logout functionality
+  logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("user");
+    alert("You have been logged out!");
+    window.location.href = "login.html"; // redirect to login page
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-lg-10">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-header bg-gradient text-white rounded-top-4" 
+                 style="background: linear-gradient(135deg, #2e7d32, #66bb6a);">
+                <h3 class="card-title mb-0">
+                    <i class="bi bi-clock-history me-2"></i> Search History
+                </h3>
+            </div>
+            <div class="card-body p-4">
+                {% if history %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-success">
+                            <tr>
+                                <th>Date</th>
+                                <th>Filename</th>
+                                <th>Soil Type</th>
+                                <th>Moisture Level</th>
+                                <th>Recommendations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in history %}
+                            <tr>
+                                <td><span class="badge bg-light text-dark">{{ item['search_date'] }}</span></td>
+                                <td><i class="bi bi-file-earmark-text text-primary"></i> {{ item['filename'] }}</td>
+                                <td><span class="fw-semibold text-success">{{ item['soil_type'] }}</span></td>
+                                <td>
+                                    {% if item['moisture_level'] == "High" %}
+                                        <span class="badge bg-danger">High</span>
+                                    {% elif item['moisture_level'] == "Medium" %}
+                                        <span class="badge bg-warning text-dark">Medium</span>
+                                    {% else %}
+                                        <span class="badge bg-info text-dark">Low</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary rounded-pill toggle-btn" type="button" 
+                                            data-bs-toggle="collapse" 
+                                            data-bs-target="#details{{ item['id'] }}">
+                                        <i class="bi bi-eye"></i> View
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" class="p-0 border-0">
+                                    <div class="collapse" id="details{{ item['id'] }}">
+                                        <div class="card card-body border-start border-4 border-success bg-light">
+                                            <strong class="text-success"><i class="bi bi-lightbulb me-2"></i>AI Recommendations:</strong><br>
+                                            <p class="mb-0">{{ item['gemini_info'] | safe }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-database-exclamation display-1 text-muted"></i>
+                    <p class="text-muted mt-3 fs-5">No search history found.</p>
+                    <a href="{{ url_for('upload_file') }}" class="btn btn-lg btn-success rounded-pill px-4">
+                        <i class="bi bi-plus-circle me-2"></i> Start Analyzing Soil
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f1f8f4 !important;
+    }
+    .card {
+        border-radius: 1rem;
+    }
+    .collapse .card {
+        border-radius: 0.75rem;
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const collapses = document.querySelectorAll(".collapse");
+
+    collapses.forEach(collapse => {
+        collapse.addEventListener("shown.bs.collapse", function () {
+            const btn = this.closest("tr").previousElementSibling.querySelector(".toggle-btn");
+            btn.innerHTML = '<i class="bi bi-x-circle"></i> Close';
+            btn.classList.remove("btn-outline-primary");
+            btn.classList.add("btn-outline-danger");
+        });
+
+        collapse.addEventListener("hidden.bs.collapse", function () {
+            const btn = this.closest("tr").previousElementSibling.querySelector(".toggle-btn");
+            btn.innerHTML = '<i class="bi bi-eye"></i> View';
+            btn.classList.remove("btn-outline-danger");
+            btn.classList.add("btn-outline-primary");
+        });
+    });
+});
+</script>
+{% endblock %}
