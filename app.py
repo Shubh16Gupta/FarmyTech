@@ -268,7 +268,7 @@ from flask import render_template, request, jsonify
 
 @app.route('/market')
 def market_analysis():
-    return render_template('marketapi.html')
+    return render_template('marketapi.html', username=session.get('username'))
 
 @app.route('/api/market-data/<crop_name>')
 def get_market_data(crop_name):
