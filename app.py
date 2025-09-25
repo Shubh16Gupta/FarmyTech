@@ -213,7 +213,7 @@ def upload_file():
                 6. Potential challenges and solutions
                 
                 Please structure your response with clear headings and bullet points for easy reading.
-                and give response in markup code and dont give any backticks or ` kind of symbols
+                and give response in markup code and dont give any backticks or ` kind of symbols now back ticks nothing need organized proper text
                 """
                 
                 gemini_response = gemini_model.generate_content(prompt)
@@ -454,3 +454,4 @@ if __name__ == '__main__':
     init_db()
 
     app.run(debug=False, host="0.0.0.0")
+
